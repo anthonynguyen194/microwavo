@@ -14,10 +14,10 @@ MICROWAVE_SIZE = {WIDTH = 10, HEIGHT = 10}
 
 -- Different physical components of the game.
 COMPONENTS = {
-  swimming_pool  = {x = 0, y = 0, w = 0, h = 0, img = nil, draw = false},
-  title_label    = {x = 0, y = 0, w = 0, h = 0, img = nil, draw = false},
-  start_button   = {x = 0, y = 0, w = 0, h = 0, img = nil, draw = false},
-  quit_button    = {x = 0, y = 0, w = 0, h = 0, img = nil, draw = false},
+  swimming_pool  = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false},
+  title_label    = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false},
+  start_button   = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false},
+  quit_button    = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false},
   microwaves     = {},
   score          = {x = 0, y = 0, w = 0, h = 0, score = 0},
   results_window = {x = 0, y = 0, w = 0, h = 0, img = nil, draw = false, retry_butn = nil, return_to_menu_butn = nil}}
@@ -45,7 +45,8 @@ FOOD_ATTRIBUTES = {
 -- N/A
 -------------------------------------
 function init()
-
+  -- Set the seed for the random function.
+  math.randomseed(os.time())
 end
 
 -------------------------------------
@@ -85,35 +86,24 @@ end
 -- Gameplay functions --
 
 -------------------------------------
--- Spawns the food object in the microwave objects.
--- @param x_width The starting x-point of the food object. (Should be the x of the microwave plus half the width)
--- @param y_height The starting y-point of the food object. (should be the y of the microwave plus half the height)
+-- Generates a number from 1 to 100.
+-- @return The lotto number.
 -------------------------------------
-function spawnFood()
-  -- Loop through the table of microwaves and generate food for the empty microwaves.
-  for _, m in ipairs(COMPONENTS.microwaves) do
-    -- If food has been despawned then generate a new one for the microwave.
-    if not m.food then
-      local lotto_num = getLottoTicket()
-      -- Get the food type and the food type name.
-      local type_name, food_type = getFoodType(lotto_num)
-      local new_food = {x = m.x + (m.w / 2), y = m.y + (m.h / 2), img = nil, type = type_name, cooking_time = , decay_time =  }
-    end
-  end
+function getLottoTicket()
+  return math.random(0, 101)
 end
 
 -------------------------------------
--- Creates a microwave object and stores it in the microwaves table.
--- @param x The starting x-point of the microwave.
--- @param y The starting y-point of the microwave.
+-- Generates a number from a the possible floating point numbers min_t to max_t.
+-- @param min_t The minimum time range, type float.
+-- @param max_t The maximum time range, type float.
+-- @return Returns the floating point number between min_t and max_t
 -------------------------------------
-function createMicrowaveObject(x, y)
-  -- Make sure the number of microwaves in the table doesn't exceed the max amount.
-  if #COMPONENTS.microwaves <= MICROWAVE_MAX then
-    -- Create a new microwave and insert it into the microwaves table.
-    local new_microwave = {x = x, y = y, w = MICROWAVE_SIZE.WIDTH, h = MICROWAVE_SIZE.HEIGHT, img = nil, food = {}}
-    table.insert(COMPONENTS.microwaves, new_microwave)
-  end
+function getRandTime(min_t, max_t)
+  time = math.random(min_t * 100, max_t * 100)
+
+  -- Turn the value back into its normal decimal place.
+  return time / 100
 end
 
 -------------------------------------
@@ -146,31 +136,52 @@ function getFoodType(lotto_num)
     food_type = FOOD_ATTRIBUTES.DAIRY
   end
 
-  return type_name, new_food
+  return type_name, food_type
 end
 
 -------------------------------------
--- Generates a number from 1 to 100.
--- @return The lotto number.
+-- Spawns the food object in the microwave objects.
+-- Food object has the data members: x, y, w, h, img, type, cooking_time and decay_time.
+-- @param x_width The starting x-point of the food object. (Should be the x of the microwave plus half the width)
+-- @param y_height The starting y-point of the food object. (should be the y of the microwave plus half the height)
 -------------------------------------
-function getLottoTicket()
-  math.randomseed(os.time())
-  return math.random(0, 101)
+function spawnFood()
+  -- Loop through the table of microwaves and generate food for the empty microwaves.
+  for _, m in ipairs(COMPONENTS.microwaves) do
+    -- If food has been despawned then generate a new one for the microwave.
+    if not m.food then
+      local lotto_num = getLottoTicket()
+      -- Get the food type and the food type name.
+      local type_name, food_type = getFoodType(lotto_num)
+      local new_food = {x = m.x + (m.w / 2), y = m.y + (m.h / 2), img = nil, type = type_name,
+                        cooking_time = getRandTime(food_type.COOKING_TIME_MIN, food_type.COOKING_TIME_MAX),
+                        decay_time =  getRandTime(food_type.DECAY_TIME_MIN, food_type.DECAY_TIME_MAX)}
+
+      -- Store the new food into the microwave.
+      m.food = new_food
+    end
+  end
 end
 
 -------------------------------------
--- Generates a number from a the possible floating point numbers min_t to max_t.
--- @param min_t The minimum time range, type float.
--- @param max_t The maximum time range, type float.
--- @return Returns the floating point number between min_t and max_t
+-- Creates a microwave object and stores it in the microwaves table.
+-- Microwave data members: x, y, w, h, img, and food.
+-- @param x The starting x-point of the microwave.
+-- @param y The starting y-point of the microwave.
 -------------------------------------
-function getRandTime(min_t, max_t)
-  math.randomseed(os.time())
-  time = math.random(min_t * 100, max_t * 100)
-
-  -- Turn the value back into its normal decimal place.
-  return time / 100
+function createMicrowaveObject(x, y)
+  -- Make sure the number of microwaves in the table doesn't exceed the max amount.
+  if #COMPONENTS.microwaves <= MICROWAVE_MAX then
+    -- Create a new microwave and insert it into the microwaves table.
+    local new_microwave = {x = x, y = y, w = MICROWAVE_SIZE.WIDTH, h = MICROWAVE_SIZE.HEIGHT, img = nil, food = nil}
+    table.insert(COMPONENTS.microwaves, new_microwave)
+  end
 end
+
+
+
+
+
 -------------------------------------
 -- N/A
 -------------------------------------
