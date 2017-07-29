@@ -164,55 +164,51 @@ function spawnFood()
 end
 
 -------------------------------------
+-- Search for the food to remove in the microwave and set it to nil.
+-- @param food_to_remove The food to be removed from the microwave.
+-------------------------------------
+function despawnFood(food_to_remove)
+  -- Loop through the microwave an remove the food.
+  for _, m in COMPONENTS.microwaves do
+    if food_to_remove == m.food then
+      m.food = nil
+    end
+  end
+end
+
+-------------------------------------
 -- Creates a microwave object and stores it in the microwaves table.
--- Microwave data members: x, y, w, h, img, and food.
+-- Microwave data members: x, y, w, h, img, food and is_drawn.
 -- @param x The starting x-point of the microwave.
 -- @param y The starting y-point of the microwave.
 -------------------------------------
-function createMicrowaveObject(x, y)
+function spawnMicrowave(x, y)
   -- Make sure the number of microwaves in the table doesn't exceed the max amount.
   if #COMPONENTS.microwaves <= MICROWAVE_MAX then
     -- Create a new microwave and insert it into the microwaves table.
-    local new_microwave = {x = x, y = y, w = MICROWAVE_SIZE.WIDTH, h = MICROWAVE_SIZE.HEIGHT, img = nil, food = nil}
+    local new_microwave = {x = x, y = y, w = MICROWAVE_SIZE.WIDTH, h = MICROWAVE_SIZE.HEIGHT, img = nil, food = nil, is_drawn = false}
     table.insert(COMPONENTS.microwaves, new_microwave)
   end
 end
 
-
-
-
-
 -------------------------------------
--- N/A
--------------------------------------
-function despawnFood()
-
-end
-
--------------------------------------
--- N/A
--------------------------------------
-function spawnMicrowave()
-
-end
-
--------------------------------------
--- N/A
+-- Removes the last microwave element from the microwaves table.
 -------------------------------------
 function despawnMicrowave()
-
+  -- Remove the specific microwave object from the table.
+  last_index = #COMPONENTS.microwaves
+  table.remove(COMPONENTS.microwaves, last_index)
 end
 
 -------------------------------------
--- N/A
+-- Checks if the cooking time for the food has reached zero and returns true or false.
+-- @param food The food to check the cooking time for.
+-- @return Returns true or false if the cooking time has reached 0.
 -------------------------------------
-function microwavePressed()
-
-end
-
--------------------------------------
--- N/A
--------------------------------------
-function isFoodReady()
-
+function isFoodReady(food)
+  -- Return true if the cooking time is 0 or less than 0.
+  if food.cooking_time <= 0 then
+    return true
+  end
+  return false
 end
