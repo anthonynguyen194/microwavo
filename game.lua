@@ -6,11 +6,13 @@
 
 -- Global constants --
 
+-- Store functions in this table.
+
 -- Missing the microwave and food components.
 MICROWAVE_MAX = 5
 
 -- Dimension of the microwaves
-MICROWAVE_SIZE = {WIDTH = 10, HEIGHT = 10}
+MICROWAVE_SIZE = {WIDTH = 40, HEIGHT = 30}
 
 -- Different physical components of the game.
 COMPONENTS = {
@@ -44,9 +46,10 @@ FOOD_ATTRIBUTES = {
 -------------------------------------
 -- N/A
 -------------------------------------
-function init()
+function initialize()
   -- Set the seed for the random function.
   math.randomseed(os.time())
+
 end
 
 -------------------------------------
