@@ -89,14 +89,14 @@ FOOD_ATTRIBUTES = {
 -- Transition functions --
 
 -------------------------------------
--- N/A
+-- Setup any starting components that are to be used immediately.
 -------------------------------------
 function initialize()
   showTitleScreen()
 end
 
 -------------------------------------
--- Show the title screen.
+-- Draw the title screen, start button, and quit button.
 -------------------------------------
 function showTitleScreen()
   Components.title_label.is_drawn = true
