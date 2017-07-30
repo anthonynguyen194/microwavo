@@ -5,8 +5,7 @@ local game_module = require "game"
 
 function love.load()
   initialize()
-  -- Set background color and window size.
-  love.window.setMode(420, 600)
+  -- Set background color.
   love.graphics.setBackgroundColor(0, 139, 139)
   spawnMicrowave(50, 50)
   spawnFood()
@@ -30,7 +29,10 @@ function love.draw()
   end
 
   -- Print the score to the screen
-  COMPONENTS.score:draw();
+  COMPONENTS.score:draw()
+
+  -- Show title screen
+  showTitleScreen()
 end
 
 function love.mousepressed(x, y, button, istouch)
