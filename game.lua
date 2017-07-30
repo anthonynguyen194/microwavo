@@ -44,6 +44,10 @@ Components = {
                     end},
   microwaves     = {list = {}, is_drawn = false, is_clickable = false, clickedIndices = {},
                     draw = function (self)
+                      -- Draw the microwave. NOTE: Just here for testing the physics.
+                      love.graphics.setColor(50, 50, 50)
+                      love.graphics.polygon("fill", pool_objects[1].body:getWorldPoints(pool_objects[1].shape:getPoints()))
+                      
                       for _, m in pairs(self.list) do
                         -- draw microwave
                         love.graphics.setColor(119, 136, 153)
