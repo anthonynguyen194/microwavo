@@ -19,16 +19,18 @@ function love.update(dt)
   -- Startup the physical world.
   pool_world:update(dt)
 
-  -- Movement debugging.
-  --here we are going to create some keyboard events
-  if love.keyboard.isDown("right") then --press the right arrow key to push the ball to the right
+  -- Movement debugging and angle rotations
+  if love.keyboard.isDown("right") then
     pool_objects[1].body:applyForce(400, 0)
-  elseif love.keyboard.isDown("left") then --press the left arrow key to push the ball to the left
+  elseif love.keyboard.isDown("left") then
     pool_objects[1].body:applyForce(-400, 0)
-  elseif love.keyboard.isDown("up") then --press the up arrow key to set the ball in the air
+  elseif love.keyboard.isDown("up") then
     pool_objects[1].body:applyForce(0, -400)
   elseif love.keyboard.isDown("down") then
     pool_objects[1].body:applyForce(0, 400)
+  -- NOTE: Purpose was to tilt the microwave slightly to see how it spins and also later on detect if it can be clicked on.
+  elseif love.keyboard.isDown("space") then
+    pool_objects[1].body:setAngle(90)
   end
 end
 
@@ -110,6 +112,8 @@ function createPhysicalMicrowave(microwave)
   new_microwave.fixture = love.physics.newFixture(new_microwave.body, new_microwave.shape, 1)
   -- Create make hte microwaves bouncy.
   new_microwave.fixture:setRestitution(0.75)
+  -- Set the default angle of the physical object to 0. NOTE: Used later for debugging purposes.
+  new_microwave.angle = 0
 
   return new_microwave
 end
