@@ -3,7 +3,6 @@
 -- Include game.lua functions and variables globally.
 local game_module = require "game"
 
-
 function love.load()
   initialize()
   -- Set background color and window size.
