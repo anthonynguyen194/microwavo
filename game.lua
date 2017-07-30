@@ -63,7 +63,17 @@ Components = {
                     end,
                     clicked = function (self)
                       for _,i in pairs(self.clickedIndices) do
-                        print("Microwave at index " .. i .. " has been clicked!")
+                        self.list[i].food = nil
+                        self.list[i].cooldown = 3
+                      end
+                    end,
+                    update = function (self, dt)
+                      for _,m in pairs(self.list) do
+                        if m.food == nil then
+                          m.cooldown = m.cooldown - dt
+                        else
+                          m.food.decay_time = m.food.decay_time - dt
+                        end
                       end
                     end },
   score          = {x = 5, y = 5, score = 0, is_drawn = false,
@@ -97,6 +107,7 @@ FOOD_ATTRIBUTES = {
 -------------------------------------
 function initialize()
   showTitleScreen()
+  spawnMicrowave(50, 50)
 end
 
 -------------------------------------
@@ -133,9 +144,12 @@ function startGame()
 
   Components.microwaves.is_drawn = true
   Components.microwaves.is_clickable = true
+end
 
-  spawnMicrowave(50, 50)
+function updateGame(dt)
+  Components.microwaves:update(dt)
   spawnFood()
+  despawnFood()
 end
 
 -------------------------------------
@@ -217,31 +231,34 @@ end
 -------------------------------------
 function spawnFood()
   -- Loop through the table of microwaves and generate food for the empty microwaves.
-  for _, m in ipairs(Components.microwaves.list) do
+  for _, m in pairs(Components.microwaves.list) do
     -- If food has been despawned then generate a new one for the microwave.
     if not m.food then
-      local lotto_num = getLottoTicket()
-      -- Get the food type and the food type name.
-      local type_name, food_type = getFoodType(lotto_num)
-      local new_food = {x = m.x + (m.w / 2), y = m.y + (m.h / 2), img = nil, type = type_name,
-                        cooking_time = getRandTime(food_type.COOKING_TIME_MIN, food_type.COOKING_TIME_MAX),
-                        decay_time =  getRandTime(food_type.DECAY_TIME_MIN, food_type.DECAY_TIME_MAX)}
+      if m.cooldown < 0 then
+        local lotto_num = getLottoTicket()
+        -- Get the food type and the food type name.
+        local type_name, food_type = getFoodType(lotto_num)
+        local new_food = {x = m.x + (m.w / 2), y = m.y + (m.h / 2), img = nil, type = type_name,
+                          cooking_time = getRandTime(food_type.COOKING_TIME_MIN, food_type.COOKING_TIME_MAX),
+                          decay_time =  getRandTime(food_type.DECAY_TIME_MIN, food_type.DECAY_TIME_MAX)}
 
-      -- Store the new food into the microwave.
-      m.food = new_food
+        -- Store the new food into the microwave.
+        m.food = new_food
+      end
     end
   end
 end
 
 -------------------------------------
--- Search for the food to remove in the microwave and set it to nil.
--- @param food_to_remove The food to be removed from the microwave.
+-- Despawns expired food objects in microwaves.
 -------------------------------------
-function despawnFood(food_to_remove)
+function despawnFood()
   -- Loop through the microwave an remove the food.
-  for _, m in Components.microwaves.list do
-    if food_to_remove == m.food then
-      m.food = nil
+  for _, m in pairs(Components.microwaves.list) do
+    if m.food then
+      if m.food.decay_time < 0 then
+        m.food = nil
+      end
     end
   end
 end
@@ -256,7 +273,7 @@ function spawnMicrowave(x, y)
   -- Make sure the number of microwaves in the table doesn't exceed the max amount.
   if #Components.microwaves.list <= MICROWAVE_MAX then
     -- Create a new microwave and insert it into the microwaves table.
-    local new_microwave = {x = x, y = y, w = MICROWAVE_SIZE.WIDTH, h = MICROWAVE_SIZE.HEIGHT, img = nil, food = nil, is_drawn = false}
+    local new_microwave = {x = x, y = y, w = MICROWAVE_SIZE.WIDTH, h = MICROWAVE_SIZE.HEIGHT, img = nil, food = nil, cooldown = 0}
     table.insert(Components.microwaves.list, new_microwave)
   end
 end

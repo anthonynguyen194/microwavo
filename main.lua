@@ -12,16 +12,15 @@ function love.load()
 
   -- Initialize the game
   initialize()
-  -- Spawn the microwave and setup the physical world.
-  spawnMicrowave(50, 50)
-  spawnFood()
   createPhysicalWorld()
-
 end
 
 function love.update(dt)
   -- Startup the physical world.
   pool_world:update(dt)
+
+  -- Update game
+  updateGame(dt)
 
   -- Movement debugging and angle rotations
   if love.keyboard.isDown("right") then
