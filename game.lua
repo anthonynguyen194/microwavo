@@ -23,17 +23,24 @@ COMPONENTS = {
                       love.graphics.setColor(255, 255, 255)
                       love.graphics.draw(self.img, self.x, self.y)
                     end},
-  start_button   = {x = 52, y = 350, is_drawn = true,
+  start_button   = {x = 52, y = 350, w = 105, h = 50, is_drawn = true, is_clickable = true,
                     img = love.graphics.newImage("assets/start-button.png"),
                     draw = function (self)
                       love.graphics.setColor(255, 255, 255)
                       love.graphics.draw(self.img, self.x, self.y)
+                    end,
+                    clicked = function (self)
+                      removeTitleScreen()
+                      startGame()
                     end},
-  quit_button    = {x = 263, y = 350, is_drawn = true,
+  quit_button    = {x = 263, y = 350, w = 105, h = 50, is_drawn = true, is_clickable = true,
                     img = love.graphics.newImage("assets/quit-button.png"),
                     draw = function (self)
                       love.graphics.setColor(255, 255, 255)
                       love.graphics.draw(self.img, self.x, self.y)
+                    end,
+                    clicked = function (self)
+                      quit()
                     end},
   microwaves     = {},
   score          = {x = 5, y = 5, score = 0, is_drawn = false,
@@ -68,37 +75,59 @@ FOOD_ATTRIBUTES = {
 function initialize()
   -- Set the seed for the random function.
   math.randomseed(os.time())
-
+  showTitleScreen()
 end
 
 -------------------------------------
 -- Draw the title screen, start button, and quit button.
 -------------------------------------
 function showTitleScreen()
+  COMPONENTS.title_label.is_drawn = true;
+  COMPONENTS.start_button.is_drawn = true;
+  COMPONENTS.quit_button.is_drawn = true;
+
+  COMPONENTS.start_button.is_clickable = true;
+  COMPONENTS.quit_button.is_clickable  = true;
+
+  -- Remove draw calls once microwaves have a draw function.
   COMPONENTS.title_label:draw()
   COMPONENTS.start_button:draw()
   COMPONENTS.quit_button:draw()
 end
 
 -------------------------------------
+-- Remove the title screen.
+-------------------------------------
+function removeTitleScreen()
+  -- Remove this line once microwaves have a draw function.
+  print("Removing title screen.")
+
+  COMPONENTS.title_label.is_drawn = false;
+  COMPONENTS.start_button.is_drawn = false;
+  COMPONENTS.quit_button.is_drawn = false;
+
+  COMPONENTS.start_button.is_clickable= false;
+  COMPONENTS.quit_button.is_clickable = false;
+end
+
+-------------------------------------
 -- N/A
 -------------------------------------
 function startGame()
-
+  COMPONENTS.score.is_drawn = true;
 end
 
 -------------------------------------
 -- N/A
 -------------------------------------
 function quit()
-
+  love.event.quit()
 end
 
 -------------------------------------
 -- N/A
 -------------------------------------
 function showResultScreen()
-            quit()
             showTitleScreen()
 
 end
