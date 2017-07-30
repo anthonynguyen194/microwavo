@@ -41,14 +41,14 @@ function love.draw()
 
 
   --[[
-    Draw calls below this line will be replaced by 
+    Draw calls below this line will be replaced by
       for each COMPONENT, call draw()
     once the microwave draw function is moved into the microwaves.
     ]]--
   -- Print the score to the screen
   COMPONENTS.score:draw()
   -- Show title screen
-  --showTitleScreen()
+  -- showTitleScreen()
 end
 
 function love.mousepressed(x, y, button, istouch)

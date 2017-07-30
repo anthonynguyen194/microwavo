@@ -12,7 +12,7 @@
 MICROWAVE_MAX = 5
 
 -- Dimension of the microwaves
-MICROWAVE_SIZE = {WIDTH = 40, HEIGHT = 30}
+MICROWAVE_SIZE = {WIDTH = 50, HEIGHT = 40}
 
 -- Different physical components of the game.
 COMPONENTS = {
