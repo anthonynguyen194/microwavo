@@ -70,7 +70,7 @@ FOOD_ATTRIBUTES = {
 -- Transition functions --
 
 -------------------------------------
--- N/A
+-- Setup any starting components that are to be used immediately.
 -------------------------------------
 function initialize()
   -- Set the seed for the random function.
@@ -79,7 +79,7 @@ function initialize()
 end
 
 -------------------------------------
--- Show the title screen.
+-- Draw the title screen, start button, and quit button.
 -------------------------------------
 function showTitleScreen()
   COMPONENTS.title_label.is_drawn = true;
