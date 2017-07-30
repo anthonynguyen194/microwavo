@@ -146,6 +146,8 @@ function createPhysicalMicrowave(microwave)
   new_microwave.fixture:setRestitution(0.75)
   -- Set the default angle of the physical object to 0. NOTE: Used later for debugging purposes.
   new_microwave.angle = 0
+  -- Assign the physical object to the logical microwave.
+  microwave.object = new_microwave
 
   return new_microwave
 end

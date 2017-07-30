@@ -44,15 +44,10 @@ Components = {
                     end},
   microwaves     = {list = {}, is_drawn = false, is_clickable = false, clickedIndices = {},
                     draw = function (self)
-                      -- Draw the microwave. NOTE: Just here for testing the physics.
-                      love.graphics.setColor(50, 50, 50)
-                      love.graphics.polygon("fill", pool_objects[1].body:getWorldPoints(pool_objects[1].shape:getPoints()))
-                      
                       for _, m in pairs(self.list) do
-                        -- draw microwave
-                        love.graphics.setColor(119, 136, 153)
-                        love.graphics.rectangle("line", m.x, m.y, m.w, m.h)
-
+                        -- Draw the microwave. NOTE: Just here for testing the physics.
+                        love.graphics.setColor(50, 50, 50)
+                        love.graphics.polygon("fill", m.object.body:getWorldPoints(m.object.shape:getPoints()))
                         -- if there is food inside the microwave
                         if m.food then
                           -- draw food
@@ -148,8 +143,9 @@ end
 
 function updateGame(dt)
   Components.microwaves:update(dt)
+  updateMicrowaves()
   spawnFood()
-  despawnFood()
+  --despawnFood()
 end
 
 -------------------------------------
@@ -168,6 +164,22 @@ function showResultScreen()
 end
 
 -- Gameplay functions --
+
+-------------------------------------
+-- Update the center (X, Y) position of the microwave from the physical object.
+-------------------------------------
+function updateMicrowaves()
+  for _, m in ipairs(Components.microwaves.list) do
+    -- Update position of the microwave.
+    m.x = m.object.body:getX()
+    m.y = m.object.body:getY()
+    -- Update position of the food.
+    if m.food then
+      m.food.x = m.x
+      m.food.y = m.y
+    end
+  end
+end
 
 -------------------------------------
 -- Generates a number from 1 to 100.
@@ -238,7 +250,7 @@ function spawnFood()
         local lotto_num = getLottoTicket()
         -- Get the food type and the food type name.
         local type_name, food_type = getFoodType(lotto_num)
-        local new_food = {x = m.x + (m.w / 2), y = m.y + (m.h / 2), img = nil, type = type_name,
+        local new_food = {x = m.x, y = m.y, img = nil, type = type_name,
                           cooking_time = getRandTime(food_type.COOKING_TIME_MIN, food_type.COOKING_TIME_MAX),
                           decay_time =  getRandTime(food_type.DECAY_TIME_MIN, food_type.DECAY_TIME_MAX)}
 
@@ -273,7 +285,7 @@ function spawnMicrowave(x, y)
   -- Make sure the number of microwaves in the table doesn't exceed the max amount.
   if #Components.microwaves.list <= MICROWAVE_MAX then
     -- Create a new microwave and insert it into the microwaves table.
-    local new_microwave = {x = x, y = y, w = MICROWAVE_SIZE.WIDTH, h = MICROWAVE_SIZE.HEIGHT, img = nil, food = nil, cooldown = 0}
+    local new_microwave = {x = x, y = y, w = MICROWAVE_SIZE.WIDTH, h = MICROWAVE_SIZE.HEIGHT, img = nil, food = nil, object = nil, cooldown = 0}
     table.insert(Components.microwaves.list, new_microwave)
   end
 end
