@@ -114,6 +114,7 @@ end
 -- N/A
 -------------------------------------
 function startGame()
+  COMPONENTS.score.is_drawn = true;
 end
 
 -------------------------------------
