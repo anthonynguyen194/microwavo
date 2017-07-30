@@ -1,29 +1,29 @@
 --[[game.lua
     - Handles all game logic and visual represnetations to the users.
     - Each component can draw itself.
-    - The order in which the component appears in the COMPONENTS table is important.
+    - The order in which the component appears in the Components table is important.
 ]]--
 
 -- Global constants --
 
 -- Store functions in this table.
 
--- Missing the microwave and food components.
+-- Missing the microwave and food Components.
 MICROWAVE_MAX = 5
 
 -- Dimension of the microwaves
 MICROWAVE_SIZE = {WIDTH = 40, HEIGHT = 30}
 
--- Different physical components of the game.
-COMPONENTS = {
+-- Different physical Components of the game.
+Components = {
   swimming_pool  = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false},
-  title_label    = {x = 52, y = 200, is_drawn = true,
+  title_label    = {x = 52, y = 200, is_drawn = false,
                     img = love.graphics.newImage("assets/title.png"),
                     draw = function (self)
                       love.graphics.setColor(255, 255, 255)
                       love.graphics.draw(self.img, self.x, self.y)
                     end},
-  start_button   = {x = 52, y = 350, w = 105, h = 50, is_drawn = true, is_clickable = true,
+  start_button   = {x = 52, y = 350, w = 105, h = 50, is_drawn = false, is_clickable = false,
                     img = love.graphics.newImage("assets/start-button.png"),
                     draw = function (self)
                       love.graphics.setColor(255, 255, 255)
@@ -33,7 +33,7 @@ COMPONENTS = {
                       removeTitleScreen()
                       startGame()
                     end},
-  quit_button    = {x = 263, y = 350, w = 105, h = 50, is_drawn = true, is_clickable = true,
+  quit_button    = {x = 263, y = 350, w = 105, h = 50, is_drawn = false, is_clickable = false,
                     img = love.graphics.newImage("assets/quit-button.png"),
                     draw = function (self)
                       love.graphics.setColor(255, 255, 255)
@@ -42,7 +42,26 @@ COMPONENTS = {
                     clicked = function (self)
                       quit()
                     end},
-  microwaves     = {},
+  microwaves     = {list = {}, is_drawn = false, is_clickable = false, clickedIndices = {},
+                    draw = function (self)
+                      for _, m in pairs(self.list) do
+                        -- draw microwave
+                        love.graphics.setColor(119, 136, 153)
+                        love.graphics.rectangle("line", m.x, m.y, m.w, m.h)
+
+                        -- if there is food inside the microwave
+                        if m.food then
+                          -- draw food
+                          love.graphics.setColor(220, 20, 60)
+                          love.graphics.circle("fill", m.food.x, m.food.y, 5)
+                        end
+                      end
+                    end,
+                    clicked = function (self)
+                      for _,i in pairs(self.clickedIndices) do
+                        print("Microwave at index " .. i .. " has been clicked!")
+                      end
+                    end },
   score          = {x = 5, y = 5, score = 0, is_drawn = false,
                     draw = function (self)
                       love.graphics.setColor(255, 255, 255)
@@ -73,8 +92,6 @@ FOOD_ATTRIBUTES = {
 -- N/A
 -------------------------------------
 function initialize()
-  -- Set the seed for the random function.
-  math.randomseed(os.time())
   showTitleScreen()
 end
 
@@ -82,39 +99,39 @@ end
 -- Show the title screen.
 -------------------------------------
 function showTitleScreen()
-  COMPONENTS.title_label.is_drawn = true;
-  COMPONENTS.start_button.is_drawn = true;
-  COMPONENTS.quit_button.is_drawn = true;
+  Components.title_label.is_drawn = true
 
-  COMPONENTS.start_button.is_clickable = true;
-  COMPONENTS.quit_button.is_clickable  = true;
+  Components.start_button.is_drawn = true
+  Components.start_button.is_clickable = true
 
-  -- Remove draw calls once microwaves have a draw function.
-  COMPONENTS.title_label:draw()
-  COMPONENTS.start_button:draw()
-  COMPONENTS.quit_button:draw()
+  Components.quit_button.is_drawn = true
+  Components.quit_button.is_clickable  = true
 end
 
 -------------------------------------
 -- Remove the title screen.
 -------------------------------------
 function removeTitleScreen()
-  -- Remove this line once microwaves have a draw function.
-  print("Removing title screen.")
+  Components.title_label.is_drawn = false
 
-  COMPONENTS.title_label.is_drawn = false;
-  COMPONENTS.start_button.is_drawn = false;
-  COMPONENTS.quit_button.is_drawn = false;
+  Components.start_button.is_drawn = false
+  Components.start_button.is_clickable= false
 
-  COMPONENTS.start_button.is_clickable= false;
-  COMPONENTS.quit_button.is_clickable = false;
+  Components.quit_button.is_drawn = false
+  Components.quit_button.is_clickable = false
 end
 
 -------------------------------------
 -- N/A
 -------------------------------------
 function startGame()
-  COMPONENTS.score.is_drawn = true;
+  Components.score.is_drawn = true
+
+  Components.microwaves.is_drawn = true
+  Components.microwaves.is_clickable = true
+
+  spawnMicrowave(50, 50)
+  spawnFood()
 end
 
 -------------------------------------
@@ -196,7 +213,7 @@ end
 -------------------------------------
 function spawnFood()
   -- Loop through the table of microwaves and generate food for the empty microwaves.
-  for _, m in ipairs(COMPONENTS.microwaves) do
+  for _, m in ipairs(Components.microwaves.list) do
     -- If food has been despawned then generate a new one for the microwave.
     if not m.food then
       local lotto_num = getLottoTicket()
@@ -218,7 +235,7 @@ end
 -------------------------------------
 function despawnFood(food_to_remove)
   -- Loop through the microwave an remove the food.
-  for _, m in COMPONENTS.microwaves do
+  for _, m in Components.microwaves.list do
     if food_to_remove == m.food then
       m.food = nil
     end
@@ -233,10 +250,10 @@ end
 -------------------------------------
 function spawnMicrowave(x, y)
   -- Make sure the number of microwaves in the table doesn't exceed the max amount.
-  if #COMPONENTS.microwaves <= MICROWAVE_MAX then
+  if #Components.microwaves.list <= MICROWAVE_MAX then
     -- Create a new microwave and insert it into the microwaves table.
     local new_microwave = {x = x, y = y, w = MICROWAVE_SIZE.WIDTH, h = MICROWAVE_SIZE.HEIGHT, img = nil, food = nil, is_drawn = false}
-    table.insert(COMPONENTS.microwaves, new_microwave)
+    table.insert(Components.microwaves.list, new_microwave)
   end
 end
 
@@ -245,8 +262,8 @@ end
 -------------------------------------
 function despawnMicrowave()
   -- Remove the specific microwave object from the table.
-  last_index = #COMPONENTS.microwaves
-  table.remove(COMPONENTS.microwaves, last_index)
+  last_index = #Components.microwaves.list
+  table.remove(Components.microwaves.list, last_index)
 end
 
 -------------------------------------
