@@ -10,16 +10,13 @@ function love.load()
   -- Set background color.
   love.graphics.setBackgroundColor(0, 139, 139)
 
-<<<<<<< HEAD
   -- Initialize the game
   initialize()
-=======
   -- Spawn the microwave and setup the physical world.
   spawnMicrowave(50, 50)
   spawnFood()
   createPhysicalWorld()
 
->>>>>>> beb97bca11f50919c098fc050b825fc2eea55a95
 end
 
 function love.update(dt)
@@ -42,28 +39,11 @@ function love.update(dt)
 end
 
 function love.draw()
-<<<<<<< HEAD
   for _,c in pairs(Components) do
     if c.is_drawn then
       c:draw()
     end
   end
-=======
-   -- Draw the microwave. NOTE: Just here for testing the physics.
-  love.graphics.setColor(50, 50, 50)
-  love.graphics.polygon("fill", pool_objects[1].body:getWorldPoints(pool_objects[1].shape:getPoints()))
-
-
-  --[[
-    Draw calls below this line will be replaced by 
-      for each COMPONENT, call draw()
-    once the microwave draw function is moved into the microwaves.
-    ]]--
-  -- Print the score to the screen
-  COMPONENTS.score:draw()
-  -- Show title screen
-  --showTitleScreen()
->>>>>>> beb97bca11f50919c098fc050b825fc2eea55a95
 end
 
 function love.mousepressed(x, y, button, istouch)
@@ -119,7 +99,7 @@ function createPhysicalWorld()
   createContainer()
   -- Create the physical microwave and store it.
   -- NOTE: This should loop through the microwaves that should been seen on screen.
-  table.insert(pool_objects, createPhysicalMicrowave(COMPONENTS.microwaves[1]))
+  table.insert(pool_objects, createPhysicalMicrowave(Components.microwaves.list[1]))
 end
 
 -------------------------------------
