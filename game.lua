@@ -17,16 +17,31 @@ MICROWAVE_SIZE = {WIDTH = 40, HEIGHT = 30}
 -- Different physical components of the game.
 COMPONENTS = {
   swimming_pool  = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false},
-  title_label    = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false},
-  start_button   = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false},
-  quit_button    = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false},
+  title_label    = {x = 52, y = 200, is_drawn = true,
+                    img = love.graphics.newImage("assets/title.png"),
+                    draw = function (self)
+                      love.graphics.setColor(255, 255, 255)
+                      love.graphics.draw(self.img, self.x, self.y)
+                    end},
+  start_button   = {x = 52, y = 350, is_drawn = true,
+                    img = love.graphics.newImage("assets/start-button.png"),
+                    draw = function (self)
+                      love.graphics.setColor(255, 255, 255)
+                      love.graphics.draw(self.img, self.x, self.y)
+                    end},
+  quit_button    = {x = 263, y = 350, is_drawn = true,
+                    img = love.graphics.newImage("assets/quit-button.png"),
+                    draw = function (self)
+                      love.graphics.setColor(255, 255, 255)
+                      love.graphics.draw(self.img, self.x, self.y)
+                    end},
   microwaves     = {},
-  score          = {x = 5, y = 5, score = 0,
+  score          = {x = 5, y = 5, score = 0, is_drawn = false,
                     draw = function (self)
                       love.graphics.setColor(255, 255, 255)
                       love.graphics.print("Score = " .. self.score, self.x, self.y, 0, 1.25)
                     end},
-  results_window = {x = 0, y = 0, w = 0, h = 0, img = nil, draw = false, retry_butn = nil, return_to_menu_butn = nil}}
+  results_window = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false, retry_butn = nil, return_to_menu_butn = nil}}
 
 -- Stores the attribute of each food group.
 FOOD_ATTRIBUTES = {
@@ -64,7 +79,9 @@ function showTitleScreen()
       title label
       start button
       quit button]]
-
+  COMPONENTS.title_label:draw()
+  COMPONENTS.start_button:draw()
+  COMPONENTS.quit_button:draw()
 end
 
 -------------------------------------
