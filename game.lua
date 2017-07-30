@@ -21,7 +21,11 @@ COMPONENTS = {
   start_button   = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false},
   quit_button    = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false},
   microwaves     = {},
-  score          = {x = 0, y = 0, w = 0, h = 0, score = 0},
+  score          = {x = 5, y = 5, score = 0,
+                    draw = function (self)
+                      love.graphics.setColor(255, 255, 255)
+                      love.graphics.print("Score = " .. self.score, self.x, self.y, 0, 1.25)
+                    end},
   results_window = {x = 0, y = 0, w = 0, h = 0, img = nil, draw = false, retry_butn = nil, return_to_menu_butn = nil}}
 
 -- Stores the attribute of each food group.
