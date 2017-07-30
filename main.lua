@@ -29,6 +29,9 @@ function love.draw()
     love.graphics.setColor(220, 20, 60)
     love.graphics.circle("fill", m.food.x, m.food.y, 5)
   end
+
+  -- Print the score to the screen
+  COMPONENTS.score:draw();
 end
 
 function love.mousepressed(x, y, button, istouch)
