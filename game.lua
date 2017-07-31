@@ -63,7 +63,7 @@ Components = {
                               -- if there is food inside the microwave
                               if m.food then
                                 -- draw food
-                                love.graphics.setColor(220, 20, 60)
+                                love.graphics.setColor(m.food.color)
                                 love.graphics.circle("fill", m.food.x, m.food.y, m.food.radius)
                               end
                             end
@@ -74,12 +74,10 @@ Components = {
                               -- if there was a food and it was ready
                               if microwave.food
                                  and microwave.food.cooking_time < 0 then
-                                print("Good one. +1")
-                                Components.score.score = Components.score.score + 1
+                                Components.score.score = Components.score.score + microwave.food.score
                                 microwave.food = nil
                                 microwave.cooldown = MICROWAVE_COOLDOWN
                               else
-                                print("Suck deez nutz")
                                 -- Tried to remove the food too early, destory the microwave
                                 table.remove(Components.microwaves.list, i)
                               end
@@ -152,19 +150,19 @@ Components = {
 -- Stores the attribute of each food group.
 FOOD_ATTRIBUTES = {
   VEGGY = {LOTTO_NUM = 25, COOKING_TIME_MIN = 2, COOKING_TIME_MAX = 3,
-           DECAY_TIME_MIN = 1, DECAY_TIME_MAX = 3, SCORE = 1},
+           DECAY_TIME_MIN = 1, DECAY_TIME_MAX = 3, SCORE = 1, COLOR = {76,175,80}},
 
   GRAIN = {LOTTO_NUM = 50, COOKING_TIME_MIN = .25, COOKING_TIME_MAX = .50,
-           DECAY_TIME_MIN = 1, DECAY_TIME_MAX = 1.5, SCORE = 3},
+           DECAY_TIME_MIN = 1, DECAY_TIME_MAX = 1.5, SCORE = 3, COLOR = {141,110,99}},
 
   FRUIT = {LOTTO_NUM = 66, COOKING_TIME_MIN = 1, COOKING_TIME_MAX = 2,
-           DECAY_TIME_MIN = 1, DECAY_TIME_MAX = 1.5, SCORE = 2},
+           DECAY_TIME_MIN = 1, DECAY_TIME_MAX = 1.5, SCORE = 2, COLOR = {249,168,37}},
 
   MEAT = {LOTTO_NUM = 84, COOKING_TIME_MIN = 1, COOKING_TIME_MAX = 3,
-           DECAY_TIME_MIN = 1, DECAY_TIME_MAX = 2, SCORE = 2},
+           DECAY_TIME_MIN = 1, DECAY_TIME_MAX = 2, SCORE = 2, COLOR = {229,57,53}},
 
   DAIRY = {LOTTO_NUM = 100, COOKING_TIME_MIN = .5, COOKING_TIME_MAX = 1,
-           DECAY_TIME_MIN = .5, DECAY_TIME_MAX = 1, SCORE = 4}}
+           DECAY_TIME_MIN = .5, DECAY_TIME_MAX = 1, SCORE = 4, COLOR = {255, 255, 255}}}
 
 -- Transition functions --
 
@@ -353,7 +351,9 @@ function spawnFood()
       local new_food = {x = m.x, y = m.y, img = nil, type = type_name,
                         cooking_time = getRandTime(food_type.COOKING_TIME_MIN, food_type.COOKING_TIME_MAX),
                         decay_time =  getRandTime(food_type.DECAY_TIME_MIN, food_type.DECAY_TIME_MAX),
-                        radius = INITIAL_FOOD_RADIUS}
+                        radius = INITIAL_FOOD_RADIUS,
+                        score = food_type.SCORE,
+                        color = food_type.COLOR}
 
       -- Store the new food into the microwave.
       m.food = new_food
