@@ -17,6 +17,12 @@ MICROWAVE_SIZE = {WIDTH = 50, HEIGHT = 40}
 -- Cooldown time for a microwave to be ready to hold a food again.
 MICROWAVE_COOLDOWN = 1
 
+-- Every MICROWAVE_SPAWN_BASE_SCORE points the user gains, spawn a microwave.
+MICROWAVE_SPAWN_BASE_SCORE = 1
+
+-- Points needed to spawn another microwave
+POINTS_TO_NEW_MICROWAVE = 0
+
 -- Initial Food radius
 INITIAL_FOOD_RADIUS = 5
 
@@ -75,6 +81,7 @@ Components = {
                               if microwave.food
                                  and microwave.food.cooking_time < 0 then
                                 Components.score.score = Components.score.score + microwave.food.score
+                                POINTS_TO_NEW_MICROWAVE = POINTS_TO_NEW_MICROWAVE - microwave.food.score
                                 microwave.food = nil
                                 microwave.cooldown = MICROWAVE_COOLDOWN
                               else
@@ -218,6 +225,7 @@ function updateGame(dt)
     Components.microwaves:update(dt)
     spawnFood()
     despawnFood()
+    spawnMicrowave()
     handleGameOver()
   end
 end
@@ -225,12 +233,14 @@ end
 function resetGame()
   PAUSED_GAME = true
 
+  POINTS_TO_NEW_MICROWAVE = 0
+
   Components.score.score = 0
   Components.score.is_drawn = false
 
   -- Wipe the microwave list
   for k,v in pairs (Components.microwaves.list) do
-      Components.microwaves.list[k] = nil
+    Components.microwaves.list[k] = nil
   end
   Components.microwaves.is_drawn = false
   Components.microwaves.is_clickable = false
@@ -381,15 +391,21 @@ end
 -- Creates a microwave object and stores it in the microwaves table.
 -------------------------------------
 function spawnMicrowave()
-  -- Make sure the number of microwaves in the table doesn't exceed the max amount.
-  if #Components.microwaves.list <= MICROWAVE_MAX then
-    local x = math.random(0, love.graphics.getWidth() - 1)
-    local y = math.random(0, love.graphics.getHeight() - 1)
-    -- Create a new microwave and insert it into the microwaves table.
-    local new_microwave = {x = x, y = y, w = MICROWAVE_SIZE.WIDTH, h = MICROWAVE_SIZE.HEIGHT, img = nil, food = nil, object = nil, cooldown = 0}
-    -- Assign the microwave a physical body.
-    new_microwave.object = createPhysicalMicrowave(new_microwave)
-    table.insert(Components.microwaves.list, new_microwave)
+  -- if the user has enough points
+  if (POINTS_TO_NEW_MICROWAVE <= 0) then
+    -- update the required number of points to spawn a new microwave
+    POINTS_TO_NEW_MICROWAVE = MICROWAVE_SPAWN_BASE_SCORE
+
+    -- Make sure the number of microwaves in the table doesn't exceed the max amount.
+    if #Components.microwaves.list <= MICROWAVE_MAX then
+      local x = math.random(0, love.graphics.getWidth() - 1)
+      local y = math.random(0, love.graphics.getHeight() - 1)
+      -- Create a new microwave and insert it into the microwaves table.
+      local new_microwave = {x = x, y = y, w = MICROWAVE_SIZE.WIDTH, h = MICROWAVE_SIZE.HEIGHT, img = nil, food = nil, object = nil, cooldown = 0}
+      -- Assign the microwave a physical body.
+      new_microwave.object = createPhysicalMicrowave(new_microwave)
+      table.insert(Components.microwaves.list, new_microwave)
+    end
   end
 end
 
