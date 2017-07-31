@@ -171,7 +171,7 @@ FOOD_ATTRIBUTES = {
 -------------------------------------
 function initialize()
   showTitleScreen()
-  spawnMicrowave(50, 50)
+  spawnMicrowave()
 end
 
 -------------------------------------
@@ -236,7 +236,7 @@ function resetGame()
   Components.microwaves.is_clickable = false
 
   -- Create just a initial microwave
-  spawnMicrowave(50, 50)
+  spawnMicrowave()
 end
 
 function handleGameOver()
@@ -379,13 +379,12 @@ end
 
 -------------------------------------
 -- Creates a microwave object and stores it in the microwaves table.
--- Microwave data members: x, y, w, h, img, food and is_drawn.
--- @param x The starting x-point of the microwave.
--- @param y The starting y-point of the microwave.
 -------------------------------------
-function spawnMicrowave(x, y)
+function spawnMicrowave()
   -- Make sure the number of microwaves in the table doesn't exceed the max amount.
   if #Components.microwaves.list <= MICROWAVE_MAX then
+    local x = math.random(0, love.graphics.getWidth() - 1)
+    local y = math.random(0, love.graphics.getHeight() - 1)
     -- Create a new microwave and insert it into the microwaves table.
     local new_microwave = {x = x, y = y, w = MICROWAVE_SIZE.WIDTH, h = MICROWAVE_SIZE.HEIGHT, img = nil, food = nil, object = nil, cooldown = 0}
     -- Assign the microwave a physical body.
