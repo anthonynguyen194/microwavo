@@ -22,77 +22,103 @@ PAUSED_GAME = true
 
 -- Different physical Components of the game.
 Components = {
-  swimming_pool  = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false},
-  title_label    = {x = 52, y = 200, is_drawn = false,
-                    img = love.graphics.newImage("assets/title.png"),
-                    draw = function (self)
-                      love.graphics.setColor(255, 255, 255)
-                      love.graphics.draw(self.img, self.x, self.y)
-                    end},
-  start_button   = {x = 52, y = 350, w = 105, h = 50, is_drawn = false, is_clickable = false,
-                    img = love.graphics.newImage("assets/start-button.png"),
-                    draw = function (self)
-                      love.graphics.setColor(255, 255, 255)
-                      love.graphics.draw(self.img, self.x, self.y)
-                    end,
-                    clicked = function (self)
-                      removeTitleScreen()
-                      startGame()
-                    end},
-  quit_button    = {x = 263, y = 350, w = 105, h = 50, is_drawn = false, is_clickable = false,
-                    img = love.graphics.newImage("assets/quit-button.png"),
-                    draw = function (self)
-                      love.graphics.setColor(255, 255, 255)
-                      love.graphics.draw(self.img, self.x, self.y)
-                    end,
-                    clicked = function (self)
-                      quit()
-                    end},
-  microwaves     = {list = {}, is_drawn = false, is_clickable = false, clickedIndices = {},
-                    draw = function (self)
-                      for _, m in pairs(self.list) do
-                        -- Draw the microwave. NOTE: Just here for testing the physics.
-                        love.graphics.setColor(50, 50, 50)
-                        love.graphics.polygon("fill", m.object.body:getWorldPoints(m.object.shape:getPoints()))
-                        -- if there is food inside the microwave
-                        if m.food then
-                          -- draw food
-                          love.graphics.setColor(220, 20, 60)
-                          love.graphics.circle("fill", m.food.x, m.food.y, 5)
-                        end
-                      end
-                    end,
-                    clicked = function (self)
-                      for _,i in pairs(self.clickedIndices) do
-                        self.list[i].food = nil
-                        self.list[i].cooldown = MICROWAVE_COOLDOWN
-                      end
-                    end,
-                    update = function (self, dt)
-                      for _,m in pairs(self.list) do
-                        -- Update position of the microwave.
-                        m.x = m.object.body:getX()
-                        m.y = m.object.body:getY()
-
-                        -- If the microwave has a food
-                        if m.food then
-                          -- Update the food inside the microwave
-                          if m.food then
-                            m.food.x = m.x
-                            m.food.y = m.y
-                          end
-                          m.food.decay_time = m.food.decay_time - dt
-                        else
-                          m.cooldown = m.cooldown - dt
-                        end
-                      end
-                    end },
-  score          = {x = 5, y = 5, score = 0, is_drawn = false,
-                    draw = function (self)
-                      love.graphics.setColor(255, 255, 255)
-                      love.graphics.print("Score = " .. self.score, self.x, self.y, 0, 1.25)
-                    end},
-  results_window = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false, retry_butn = nil, return_to_menu_butn = nil}}
+  swimming_pool        = {x = 0, y = 0, w = 0, h = 0, img = nil, is_drawn = false},
+  title_label          = {x = 52, y = 200, is_drawn = false,
+                          img = love.graphics.newImage("assets/title.png"),
+                          draw = function (self)
+                            love.graphics.setColor(255, 255, 255)
+                            love.graphics.draw(self.img, self.x, self.y)
+                          end},
+  start_button         = {x = 52, y = 350, w = 105, h = 50, is_drawn = false, is_clickable = false,
+                          img = love.graphics.newImage("assets/start-button.png"),
+                          draw = function (self)
+                            love.graphics.setColor(255, 255, 255)
+                            love.graphics.draw(self.img, self.x, self.y)
+                          end,
+                          clicked = function (self)
+                            removeTitleScreen()
+                            startGame()
+                          end},
+  quit_button          = {x = 263, y = 350, w = 105, h = 50, is_drawn = false, is_clickable = false,
+                          img = love.graphics.newImage("assets/quit-button.png"),
+                          draw = function (self)
+                            love.graphics.setColor(255, 255, 255)
+                            love.graphics.draw(self.img, self.x, self.y)
+                          end,
+                          clicked = function (self)
+                            quit()
+                          end},
+  microwaves           = {list = {}, is_drawn = false, is_clickable = false, clickedIndices = {},
+                          draw = function (self)
+                            for _, m in pairs(self.list) do
+                              -- Draw the microwave. NOTE: Just here for testing the physics.
+                              love.graphics.setColor(50, 50, 50)
+                              love.graphics.polygon("fill", m.object.body:getWorldPoints(m.object.shape:getPoints()))
+                              -- if there is food inside the microwave
+                              if m.food then
+                                -- draw food
+                                love.graphics.setColor(220, 20, 60)
+                                love.graphics.circle("fill", m.food.x, m.food.y, 5)
+                              end
+                            end
+                          end,
+                          clicked = function (self)
+                            for _,i in pairs(self.clickedIndices) do
+                              self.list[i].food = nil
+                              self.list[i].cooldown = MICROWAVE_COOLDOWN
+                            end
+                          end,
+                          update = function (self, dt)
+                            for _,m in pairs(self.list) do
+                              -- Update position of the microwave.
+                              m.x = m.object.body:getX()
+                              m.y = m.object.body:getY()
+                              -- If the microwave has a food
+                              if m.food then
+                                -- Update the food inside the microwave
+                                if m.food then
+                                  m.food.x = m.x
+                                  m.food.y = m.y
+                                end
+                                m.food.decay_time = m.food.decay_time - dt
+                              else
+                                m.cooldown = m.cooldown - dt
+                              end
+                            end
+                          end },
+  score                = {x = 5, y = 5, score = 0, is_drawn = false,
+                          draw = function (self)
+                            love.graphics.setColor(255, 255, 255)
+                            love.graphics.print("Score = " .. self.score, self.x, self.y, 0, 1.25)
+                          end},
+  result_label        = {x = 52, y = 200, score = 0, is_drawn = false,
+                          img = love.graphics.newImage("assets/result.png"),
+                          draw = function (self)
+                            love.graphics.setColor(255, 255, 255)
+                            love.graphics.draw(self.img, self.x, self.y)
+                            love.graphics.setColor(0, 0, 0)
+                            love.graphics.print(self.score, self.x + 150, self.y + 50, 0, 4)
+                          end},
+  retry_button         = {x = 52, y = 350, w = 105, h = 50, is_drawn = false, is_clickable = false,
+                          img = love.graphics.newImage("assets/retry-button.png"),
+                          draw = function (self)
+                            love.graphics.setColor(255, 255, 255)
+                            love.graphics.draw(self.img, self.x, self.y)
+                          end,
+                          clicked = function (self)
+                            removeResultScreen()
+                            startGame()
+                          end},
+  title_screen_button  = {x = 263, y = 350, w = 105, h = 50, is_drawn = false, is_clickable = false,
+                          img = love.graphics.newImage("assets/title-screen-button.png"),
+                          draw = function (self)
+                            love.graphics.setColor(255, 255, 255)
+                            love.graphics.draw(self.img, self.x, self.y)
+                          end,
+                          clicked = function (self)
+                            removeResultScreen()
+                            showTitleScreen()
+                          end}}
 
 -- Stores the attribute of each food group.
 FOOD_ATTRIBUTES = {
@@ -165,7 +191,61 @@ function updateGame(dt)
     Components.microwaves:update(dt)
     spawnFood()
     despawnFood()
+    handleGameOver()
   end
+end
+
+function resetGame()
+  PAUSED_GAME = true
+
+  Components.score.score = 0
+  Components.score.is_drawn = false
+
+  -- Wipe the microwave list
+  for k,v in pairs (Components.microwaves.list) do
+      Components.microwaves.list[k] = nil
+  end
+  Components.microwaves.is_drawn = false
+  Components.microwaves.is_clickable = false
+
+  -- Create just a initial microwave
+  spawnMicrowave(50, 50)
+end
+
+function handleGameOver()
+  if #Components.microwaves.list == 0 then
+    PAUSED_GAME = true
+    -- Store the score in the results screen
+    Components.result_label.score = Components.score.score
+    showResultScreen()
+    -- resetGame has to be called after because we need to display the score in the result screen
+    resetGame()
+  end
+end
+
+-------------------------------------
+-- N/A
+-------------------------------------
+function showResultScreen()
+  Components.result_label.is_drawn = true
+
+  Components.retry_button.is_drawn = true
+  Components.retry_button.is_clickable = true
+
+  Components.title_screen_button.is_drawn = true
+  Components.title_screen_button.is_clickable  = true
+end
+-------------------------------------
+-- N/A
+-------------------------------------
+function removeResultScreen()
+  Components.result_label.is_drawn = false
+
+  Components.retry_button.is_drawn = false
+  Components.retry_button.is_clickable = false
+
+  Components.title_screen_button.is_drawn = false
+  Components.title_screen_button.is_clickable  = false
 end
 
 -------------------------------------
@@ -173,14 +253,6 @@ end
 -------------------------------------
 function quit()
   love.event.quit()
-end
-
--------------------------------------
--- N/A
--------------------------------------
-function showResultScreen()
-            showTitleScreen()
-
 end
 
 -- Gameplay functions --
@@ -230,8 +302,6 @@ function getFoodType(lotto_num)
   elseif lotto_num <= FOOD_ATTRIBUTES.DAIRY.LOTTO_NUM then
     type_name = "Dairy"
     food_type = FOOD_ATTRIBUTES.DAIRY
-  else
-    print("Error with lotto_number")
   end
 
   return type_name, food_type
