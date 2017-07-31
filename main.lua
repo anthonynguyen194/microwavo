@@ -63,7 +63,7 @@ end
 function wasComponentClicked(c, x, y)
   if c.list then -- if list of component
     for index,item in ipairs(c.list) do
-      if isPtInRectangle(x, y, item.x, item.y, item.w, item.h) then
+      if item.object.fixture:testPoint(x, y) then
         table.insert(c.clickedIndices, index)
         return true
       end

@@ -220,7 +220,7 @@ function updateGame(dt)
     Components.microwaves:update(dt)
     spawnFood()
     despawnFood()
-    handleGameOver()
+    --handleGameOver()
   end
 end
 
