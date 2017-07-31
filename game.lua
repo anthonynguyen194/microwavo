@@ -17,6 +17,12 @@ MICROWAVE_SIZE = {WIDTH = 50, HEIGHT = 40}
 -- Cooldown time for a microwave to be ready to hold a food again.
 MICROWAVE_COOLDOWN = 1
 
+-- Initial Food radius
+INITIAL_FOOD_RADIUS = 5
+
+-- Food radius growth rate per second
+FOOD_RADIUS_DT = 2
+
 -- Boolean used to pause the game
 PAUSED_GAME = true
 
@@ -58,14 +64,29 @@ Components = {
                               if m.food then
                                 -- draw food
                                 love.graphics.setColor(220, 20, 60)
-                                love.graphics.circle("fill", m.food.x, m.food.y, 5)
+                                love.graphics.circle("fill", m.food.x, m.food.y, m.food.radius)
                               end
                             end
                           end,
                           clicked = function (self)
-                            for _,i in pairs(self.clickedIndices) do
-                              self.list[i].food = nil
-                              self.list[i].cooldown = MICROWAVE_COOLDOWN
+                            for i = #self.clickedIndices, 1, -1 do
+                              local microwave = self.list[i]
+                              -- if there was a food and it was ready
+                              if microwave.food
+                                 and microwave.food.cooking_time < 0 then
+                                print("Good one. +1")
+                                Components.score.score = Components.score.score + 1
+                                microwave.food = nil
+                                microwave.cooldown = MICROWAVE_COOLDOWN
+                              else
+                                print("Suck deez nutz")
+                                -- Tried to remove the food too early, destory the microwave
+                                table.remove(Components.microwaves.list, i)
+                              end
+                            end
+                            -- Clear the clickedIndices list once all the clicks have been handled
+                            for k,v in pairs (self.clickedIndices) do
+                              self.clickedIndices[k] = nil
                             end
                           end,
                           update = function (self, dt)
@@ -80,7 +101,15 @@ Components = {
                                   m.food.x = m.x
                                   m.food.y = m.y
                                 end
-                                m.food.decay_time = m.food.decay_time - dt
+
+                                -- Update food timers
+                                if m.food.cooking_time > 0 then
+                                  m.food.cooking_time = m.food.cooking_time - dt
+                                  m.food.radius = m.food.radius + FOOD_RADIUS_DT * dt
+                                else
+                                  m.food.decay_time = m.food.decay_time - dt
+                                  m.food.radius = m.food.radius - FOOD_RADIUS_DT * dt
+                                end
                               else
                                 m.cooldown = m.cooldown - dt
                               end
@@ -323,7 +352,8 @@ function spawnFood()
       local type_name, food_type = getFoodType(lotto_num)
       local new_food = {x = m.x, y = m.y, img = nil, type = type_name,
                         cooking_time = getRandTime(food_type.COOKING_TIME_MIN, food_type.COOKING_TIME_MAX),
-                        decay_time =  getRandTime(food_type.DECAY_TIME_MIN, food_type.DECAY_TIME_MAX)}
+                        decay_time =  getRandTime(food_type.DECAY_TIME_MIN, food_type.DECAY_TIME_MAX),
+                        radius = INITIAL_FOOD_RADIUS}
 
       -- Store the new food into the microwave.
       m.food = new_food
@@ -335,8 +365,6 @@ end
 -- Despawns expired food objects in microwaves.
 -------------------------------------
 function despawnFood()
-  local lostMicrowaveIndices = {}
-
   for i = #Components.microwaves.list, 1, -1 do
     local microwave = Components.microwaves.list[i]
     if microwave.food then
