@@ -63,9 +63,22 @@ Components = {
                             end
                           end,
                           clicked = function (self)
-                            for _,i in pairs(self.clickedIndices) do
-                              self.list[i].food = nil
-                              self.list[i].cooldown = MICROWAVE_COOLDOWN
+                            for i = self.clickedIndices, 1, -1 do
+                              local microwave = self.list[i]
+                              -- if there was a food and it was ready
+                              if microwave.food and
+                                 microwave.food.cooking_time < 0 then
+                                Components.score.score = Components.score.score + 1
+                                microwave.food = nil
+                                microwave.cooldown = MICROWAVE_COOLDOWN
+                              else
+                                -- Tried to remove the food too early, destory the microwave
+                                table.remove(Components.microwaves.list, i)
+                              end
+                            end
+                            -- Clear the clickedIndices list once all the clicks have been handled
+                            for k,v in pairs (self.clickedIndices) do
+                              self.clickedIndices[k] = nil
                             end
                           end,
                           update = function (self, dt)
@@ -335,8 +348,6 @@ end
 -- Despawns expired food objects in microwaves.
 -------------------------------------
 function despawnFood()
-  local lostMicrowaveIndices = {}
-
   for i = #Components.microwaves.list, 1, -1 do
     local microwave = Components.microwaves.list[i]
     if microwave.food then
