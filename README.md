@@ -11,8 +11,7 @@ Our submission:
 https://ldjam.com/events/ludum-dare/39/$33666
 
 
-Contributors:
-
+*Contributors:*
 Anthony Nguyen - https://github.com/anthonynguyen194
 
 Scott Kim - https://github.com/kimsaehun
