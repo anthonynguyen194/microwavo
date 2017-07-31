@@ -17,4 +17,4 @@ Anthony Nguyen - https://github.com/anthonynguyen194
 
 Scott Kim - https://github.com/kimsaehun
 
-Dominic Deguzman - <TBA>
+Dominic Deguzman - \<TBA\>
