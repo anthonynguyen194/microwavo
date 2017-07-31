@@ -108,7 +108,7 @@ Components = {
                                   m.food.radius = m.food.radius + FOOD_RADIUS_DT * dt
                                 else
                                   m.food.decay_time = m.food.decay_time - dt
-                                  m.food.radius = m.food.radius - FOOD_RADIUS_DT * dt
+                                  m.food.radius = m.food.radius - (m.food.radius / m.food.decay_time) * dt
                                 end
                               else
                                 m.cooldown = m.cooldown - dt
