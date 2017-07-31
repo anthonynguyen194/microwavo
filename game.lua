@@ -388,8 +388,31 @@ function spawnMicrowave(x, y)
   if #Components.microwaves.list <= MICROWAVE_MAX then
     -- Create a new microwave and insert it into the microwaves table.
     local new_microwave = {x = x, y = y, w = MICROWAVE_SIZE.WIDTH, h = MICROWAVE_SIZE.HEIGHT, img = nil, food = nil, object = nil, cooldown = 0}
+    -- Assign the microwave a physical body.
+    new_microwave.object = createPhysicalMicrowave(new_microwave)
     table.insert(Components.microwaves.list, new_microwave)
   end
+end
+
+-------------------------------------
+-- Create a physical microwave and return it.
+-- @param microwave The microwave to base the physical object on.
+-- @return Return a physical microwave.
+-------------------------------------
+function createPhysicalMicrowave(microwave)
+  new_microwave = {}
+  -- Create the physical body and anchor it to the position of the logical microwave.
+  new_microwave.body = love.physics.newBody(pool_world, microwave.x, microwave.y, "dynamic")
+  -- Establish the visual shape of the microwave i.e. a polygon.
+  new_microwave.shape = love.physics.newRectangleShape(microwave.w, microwave.h)
+  -- Fix the visual body to the physical body.
+  new_microwave.fixture = love.physics.newFixture(new_microwave.body, new_microwave.shape, 1)
+  -- Create make hte microwaves bouncy.
+  new_microwave.fixture:setRestitution(0.75)
+  -- Set the default angle of the physical object to 0. NOTE: Used later for debugging purposes.
+  new_microwave.angle = 0
+
+  return new_microwave
 end
 
 -------------------------------------

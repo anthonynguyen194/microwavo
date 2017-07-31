@@ -10,9 +10,11 @@ function love.load()
   -- Set background color.
   love.graphics.setBackgroundColor(0, 139, 139)
 
-  -- Initialize the game
-  initialize()
+  -- Establish physical world
   createPhysicalWorld()
+  -- Initialize starting game parameters
+  initialize()
+
 end
 
 function love.update(dt)
@@ -24,16 +26,16 @@ function love.update(dt)
 
   -- Movement debugging and angle rotations
   if love.keyboard.isDown("right") then
-    pool_objects[1].body:applyForce(400, 0)
+    Components.microwaves.list[1].object.body:applyForce(400, 0)
   elseif love.keyboard.isDown("left") then
-    pool_objects[1].body:applyForce(-400, 0)
+    Components.microwaves.list[1].object.body:applyForce(-400, 0)
   elseif love.keyboard.isDown("up") then
-    pool_objects[1].body:applyForce(0, -400)
+    Components.microwaves.list[1].object.body:applyForce(0, -400)
   elseif love.keyboard.isDown("down") then
-    pool_objects[1].body:applyForce(0, 400)
+    Components.microwaves.list[1].object.body:applyForce(0, 400)
   -- NOTE: Purpose was to tilt the microwave slightly to see how it spins and also later on detect if it can be clicked on.
   elseif love.keyboard.isDown("space") then
-    pool_objects[1].body:setAngle(90)
+    Components.microwaves.list[1].object.body:setAngle(90)
   end
 end
 
@@ -88,8 +90,6 @@ end
 -- Setup the physics in the pool game setting.
 -------------------------------------
 function createPhysicalWorld()
-  -- Stores all the physical pool objects.
-  pool_objects = {}
   -- Stores the boundaries for the container
   container = {}
   -- Setup the pool world and set the vertical and horizontal gravity to zero.
@@ -97,8 +97,6 @@ function createPhysicalWorld()
   -- Create the container that the pool_objects will be in.
   createContainer()
   -- Create the physical microwave and store it.
-  -- NOTE: This should loop through the microwaves that should been seen on screen.
-  table.insert(pool_objects, createPhysicalMicrowave(Components.microwaves.list[1]))
 end
 
 -------------------------------------
@@ -127,27 +125,4 @@ function createContainer()
   container.ground.shape = love.physics.newRectangleShape(love.graphics.getWidth(), 0)
   container.ground.fixture = love.physics.newFixture(container.ground.body, container.ground.shape)
 
-end
-
--------------------------------------
--- Create a physical microwave and return it.
--- @param microwave The microwave to base the physical object on.
--- @return Return a physical microwave.
--------------------------------------
-function createPhysicalMicrowave(microwave)
-  new_microwave = {}
-  -- Create the physical body and anchor it to the position of the logical microwave.
-  new_microwave.body = love.physics.newBody(pool_world, microwave.x, microwave.y, "dynamic")
-  -- Establish the visual shape of the microwave i.e. a polygon.
-  new_microwave.shape = love.physics.newRectangleShape(microwave.w, microwave.h)
-  -- Fix the visual body to the physical body.
-  new_microwave.fixture = love.physics.newFixture(new_microwave.body, new_microwave.shape, 1)
-  -- Create make hte microwaves bouncy.
-  new_microwave.fixture:setRestitution(0.75)
-  -- Set the default angle of the physical object to 0. NOTE: Used later for debugging purposes.
-  new_microwave.angle = 0
-  -- Assign the physical object to the logical microwave.
-  microwave.object = new_microwave
-
-  return new_microwave
 end
